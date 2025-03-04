@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "828363531961",
+    "project_id": "mpl-lab-922a1",
+    "storage_bucket": "mpl-lab-922a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828363531961:android:7fa38319bc23b6469cdd68",
+        "android_client_info": {
+          "package_name": "com.example.mpl_lab"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo-PO2UyqAW20IRWJC5tJPr7n5-4HAQFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
