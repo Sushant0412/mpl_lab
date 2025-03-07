@@ -167,7 +167,7 @@ class _HomeState extends State<Home> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    "©️ Copyright 2025",
+                    "©️ Copyright - Sushant 2025",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ),

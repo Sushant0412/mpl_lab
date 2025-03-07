@@ -46,19 +46,14 @@ class _MyClassState extends State<MyClass> with SingleTickerProviderStateMixin {
   }
 
   Color _generatePrimaryColor() {
-    int charCode = widget.className.isNotEmpty ? widget.className.codeUnitAt(0) : 65;
-    return HSLColor.fromAHSL(
-      1.0,
-      (charCode % 360).toDouble(),
-      0.7,
-      0.8,
-    ).toColor();
+    return Color.fromRGBO(34, 139, 34, 1);
   }
 
   @override
   Widget build(BuildContext context) {
     final primaryColor = _generatePrimaryColor();
-    final secondaryColor = HSLColor.fromColor(primaryColor).withLightness(0.6).toColor();
+    final secondaryColor =
+        HSLColor.fromColor(primaryColor).withLightness(0.6).toColor();
 
     return AnimatedBuilder(
       animation: _pulseAnimation,
@@ -78,10 +73,11 @@ class _MyClassState extends State<MyClass> with SingleTickerProviderStateMixin {
                 );
               },
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 1000),
                 curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.all(20),
-                constraints: const BoxConstraints(minHeight: 180, maxHeight: 250), // Prevent overflow
+                padding: const EdgeInsets.all(10),
+                constraints:
+                    const BoxConstraints(minHeight: 180, maxHeight: 250),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -91,9 +87,12 @@ class _MyClassState extends State<MyClass> with SingleTickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: _isHovered ? primaryColor.withOpacity(0.6) : Colors.black26,
+                      color: _isHovered
+                          ? primaryColor.withOpacity(0.6)
+                          : Colors.black26,
                       blurRadius: _isHovered ? 15 : 8,
-                      offset: _isHovered ? const Offset(0, 8) : const Offset(2, 4),
+                      offset:
+                          _isHovered ? const Offset(0, 8) : const Offset(2, 4),
                       spreadRadius: _isHovered ? 1 : 0,
                     ),
                   ],
@@ -105,109 +104,79 @@ class _MyClassState extends State<MyClass> with SingleTickerProviderStateMixin {
                       top: -10,
                       child: Opacity(
                         opacity: 0.1,
-                        child: Icon(Icons.school, size: 100, color: Colors.white),
+                        child:
+                            Icon(Icons.school, size: 100, color: Colors.white),
                       ),
                     ),
-
-                    // Scrollable Content
-                    SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(Icons.book, color: Colors.white, size: 24),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const SizedBox(width: 10),
+                              child: const Icon(Icons.book,
+                                  color: Colors.white, size: 24),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              "Class",
+                              style: GoogleFonts.openSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.9),
+                                letterSpacing: 1.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          widget.className,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                            shadows: [
+                              Shadow(
+                                  color: Colors.black26,
+                                  blurRadius: 2,
+                                  offset: Offset(1, 1)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.room,
+                                  size: 16, color: Colors.white),
+                              const SizedBox(width: 6),
                               Text(
-                                "Class",
+                                widget.room,
                                 style: GoogleFonts.openSans(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white.withOpacity(0.9),
-                                  letterSpacing: 1.2,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
                           ),
-
-                          const SizedBox(height: 16),
-
-                          Text(
-                            widget.className,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                              shadows: [
-                                Shadow(color: Colors.black26, blurRadius: 2, offset: Offset(1, 1)),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.25),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.room, size: 16, color: Colors.white),
-                                const SizedBox(width: 6),
-                                Text(
-                                  widget.room,
-                                  style: GoogleFonts.openSans(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          AnimatedOpacity(
-                            duration: const Duration(milliseconds: 200),
-                            opacity: _isHovered ? 1.0 : 0.0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "View Details",
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: primaryColor,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(Icons.arrow_forward, size: 16, color: primaryColor),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

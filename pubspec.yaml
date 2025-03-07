@@ -104,6 +104,10 @@ flutter:
         - asset: assets/fonts/Montserrat-Italic.ttf
           style: italic
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/logo.png" # Path to your main icon image
 
   #
   # For details regarding fonts from package dependencies,
