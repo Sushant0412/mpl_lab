@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ClassDetail extends StatefulWidget {
   final String classId;
@@ -100,10 +101,8 @@ class _ClassDetailState extends State<ClassDetail> {
 
   Future<void> _fetchTimetable() async {
     String today = DateFormat('EEEE').format(DateTime.now()); // Get today's day
-    //String userId = getUserId(); // Replace with actual user ID
-    //print(userId);
     String teacherId = await fetchAndPrintTeacherId();
-    print(teacherId);
+    //print(teacherId);
 
     try {
       QuerySnapshot timetableDocs = await FirebaseFirestore.instance
@@ -162,36 +161,55 @@ class _ClassDetailState extends State<ClassDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.blue.shade700,
         title: Text(
           "$className - ($room)",
-          style: TextStyle(
-              fontFamily: "Roboto", fontSize: 20, fontWeight: FontWeight.bold),
+          style: GoogleFonts.montserrat(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         actions: [
           if (subjects.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: DropdownButton<String>(
-                value: selectedSubject,
-                dropdownColor: Colors.white,
-                style: TextStyle(color: Colors.black, fontSize: 16),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    selectedSubject = newValue;
-                  });
-                },
-                items: subjects.map<DropdownMenuItem<String>>((String subject) {
-                  return DropdownMenuItem<String>(
-                    value: subject,
-                    child: Text(subject),
-                  );
-                }).toList(),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: DropdownButton<String>(
+                  value: selectedSubject,
+                  dropdownColor: Colors.blue.shade600,
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                  underline: Container(),
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedSubject = newValue;
+                    });
+                  },
+                  items:
+                      subjects.map<DropdownMenuItem<String>>((String subject) {
+                    return DropdownMenuItem<String>(
+                      value: subject,
+                      child: Text(subject),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           IconButton(
             icon: CircleAvatar(
-              backgroundColor: Colors.blue,
-              child: Icon(Icons.person, color: Colors.white),
+              backgroundColor: Colors.white,
+              child: Icon(Icons.person, color: Colors.blue.shade700),
             ),
             onPressed: () {
               Navigator.push(
@@ -204,90 +222,302 @@ class _ClassDetailState extends State<ClassDetail> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Today's Timetable",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+          : Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.blue.shade50, Colors.white],
                 ),
-                timetable.isEmpty
-                    ? Center(
-                        child: Text(
-                          "No college today!",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              child: Column(
+                children: [
+                  // Timetable Section
+                  Container(
+                    margin: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
                         ),
-                      )
-                    : Column(
-                        children: timetable
-                            .map((entry) => ListTile(
-                                  title: Text(
-                                    entry['subject'].toUpperCase(),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today,
+                                color: Colors.blue.shade700),
+                            SizedBox(width: 8),
+                            Text(
+                              "Today's Timetable",
+                              style: GoogleFonts.montserrat(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue.shade700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(color: Colors.blue.shade100, thickness: 1),
+                        timetable.isEmpty
+                            ? Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    "No classes scheduled for today!",
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.grey.shade600,
+                                    ),
                                   ),
-                                  subtitle: Text(
-                                    "Class: ${entry['room']} | Time: ${entry['time']}",
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                  leading:
-                                      Icon(Icons.schedule, color: Colors.blue),
-                                ))
-                            .toList(),
-                      ),
-                Divider(),
-                Expanded(
-                  child: students.isEmpty
-                      ? Center(
-                          child: Text(
-                            "No students found in $className.",
-                            style: TextStyle(fontSize: 18),
+                                ),
+                              )
+                            : Column(
+                                children: timetable
+                                    .map((entry) => Container(
+                                          margin:
+                                              EdgeInsets.symmetric(vertical: 6),
+                                          padding: EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue.shade50,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                                color: Colors.blue.shade100),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.blue.shade100,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(Icons.schedule,
+                                                    color:
+                                                        Colors.blue.shade700),
+                                              ),
+                                              SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      entry['subject']
+                                                          .toUpperCase(),
+                                                      style: GoogleFonts
+                                                          .montserrat(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                        color: Colors
+                                                            .blue.shade800,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      "Class: ${entry['room']} | Time: ${entry['time']}",
+                                                      style: GoogleFonts
+                                                          .montserrat(
+                                                        fontSize: 14,
+                                                        color: Colors
+                                                            .grey.shade700,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                      ],
+                    ),
+                  ),
+
+                  // Students Section
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 10,
+                            offset: Offset(0, 5),
                           ),
-                        )
-                      : ListView.builder(
-                          padding: EdgeInsets.all(16),
-                          itemCount: students.length,
-                          itemBuilder: (context, index) {
-                            final student = students[index];
-                            return Card(
-                              elevation: 2,
-                              child: ListTile(
-                                leading: Icon(Icons.person, color: Colors.blue),
-                                title: Text(
-                                  "${student['roll']}. ${student['name']}",
-                                  style: TextStyle(
-                                      fontFamily: "Roboto", fontSize: 16),
-                                ),
-                                subtitle: Text(
-                                  "Attendance in ${selectedSubject ?? 'Subject'}: ${student['attendance'][selectedSubject] ?? 0}",
-                                ),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.check_circle,
-                                          color: Colors.green),
-                                      onPressed: () =>
-                                          updateAttendance(student['id'], true),
-                                    ),
-                                    IconButton(
-                                      icon:
-                                          Icon(Icons.cancel, color: Colors.red),
-                                      onPressed: () => updateAttendance(
-                                          student['id'], false),
-                                    ),
-                                  ],
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.people, color: Colors.blue.shade700),
+                              SizedBox(width: 8),
+                              Text(
+                                "Students",
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade700,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                ),
-              ],
+                              Spacer(),
+                              if (selectedSubject != null)
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade50,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border:
+                                        Border.all(color: Colors.blue.shade200),
+                                  ),
+                                  child: Text(
+                                    selectedSubject!,
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.blue.shade700,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          Divider(color: Colors.blue.shade100, thickness: 1),
+                          Expanded(
+                            child: students.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      "No students found in $className.",
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 16,
+                                        color: Colors.grey.shade600,
+                                      ),
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    padding: EdgeInsets.only(top: 8),
+                                    itemCount: students.length,
+                                    itemBuilder: (context, index) {
+                                      final student = students[index];
+                                      final attendance = student['attendance']
+                                              [selectedSubject] ??
+                                          0;
+
+                                      return Card(
+                                        elevation: 0,
+                                        margin: EdgeInsets.only(bottom: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          side: BorderSide(
+                                              color: Colors.blue.shade100),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundColor:
+                                                    Colors.blue.shade100,
+                                                child: Text(
+                                                  student['name']
+                                                      .substring(0, 1)
+                                                      .toUpperCase(),
+                                                  style: GoogleFonts.montserrat(
+                                                    color: Colors.blue.shade700,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 16),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${student['roll']}. ${student['name']}",
+                                                      style: GoogleFonts
+                                                          .montserrat(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Attendance: $attendance",
+                                                          style: GoogleFonts
+                                                              .montserrat(
+                                                            fontSize: 14,
+                                                            color: Colors.grey,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  IconButton(
+                                                    icon: Icon(
+                                                        Icons
+                                                            .remove_circle_outline,
+                                                        color: Colors
+                                                            .red.shade400),
+                                                    onPressed: () =>
+                                                        updateAttendance(
+                                                            student['id'],
+                                                            false),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                        Icons
+                                                            .add_circle_outline,
+                                                        color: Colors
+                                                            .green.shade400),
+                                                    onPressed: () =>
+                                                        updateAttendance(
+                                                            student['id'],
+                                                            true),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
     );
   }
