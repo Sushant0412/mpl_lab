@@ -28,7 +28,6 @@ class _HomeState extends State<Home> {
     }
 
     String email = user!.email ?? '';
-    username = email.split('@')[0];
     print("Fetching teacher with email: $email");
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -38,11 +37,15 @@ class _HomeState extends State<Home> {
 
     if (querySnapshot.docs.isEmpty) {
       print("No teacher found. Creating new teacher profile...");
-      DocumentReference newTeacherRef = FirebaseFirestore.instance.collection('teachers').doc();
+      DocumentReference newTeacherRef =
+          FirebaseFirestore.instance.collection('teachers').doc();
       await newTeacherRef.set({
-        'name': username,
+        'name': email.split('@')[0],
         'email': email,
         'classes': [],
+      });
+      setState(() {
+        username = email.split('@')[0];
       });
 
       setState(() {
@@ -51,6 +54,9 @@ class _HomeState extends State<Home> {
     } else {
       var doc = querySnapshot.docs.first;
       print("Teacher document found: ${doc.id}");
+      setState(() {
+        username = doc['name'] ?? email.split('@')[0];
+      });
 
       List<dynamic>? classRefs = doc['classes'];
 
@@ -106,7 +112,10 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home Page", style: TextStyle(fontWeight: FontWeight.w600),),
+        title: const Text(
+          "Home Page",
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         actions: [
           IconButton(
             onPressed: () => _logout(context),

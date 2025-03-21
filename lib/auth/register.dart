@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -34,11 +35,11 @@ class _RegisterState extends State<Register>
     );
     _slideAnimation =
         Tween<Offset>(begin: Offset(0, -0.5), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeInOut,
-          ),
-        );
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
     _animationController.forward();
   }
 
@@ -57,12 +58,20 @@ class _RegisterState extends State<Register>
         _isLoading = true;
       });
       try {
+        // Create user with email and password
         UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
         print("Registered as: ${userCredential.user?.email}");
+
+        // Create teacher profile in Firestore
+        await FirebaseFirestore.instance.collection('teachers').doc().set({
+          'name': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'classes': [],
+        });
         Navigator.pushReplacementNamed(context, '/home');
       } on FirebaseAuthException catch (e) {
         _showErrorDialog(e.message ?? "An error occurred");
@@ -122,7 +131,8 @@ class _RegisterState extends State<Register>
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Image.asset('assets/logo.png', height: 100, width: 100),
+                              Image.asset('assets/logo.png',
+                                  height: 100, width: 100),
                               SizedBox(height: 24),
                               Text(
                                 "Create an Account",
@@ -160,21 +170,23 @@ class _RegisterState extends State<Register>
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
                                   ),
-                                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 32, vertical: 16),
                                 ),
                                 child: _isLoading
                                     ? SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
                                     : Text(
-                                  "Register",
-                                  style: TextStyle(fontSize: 18, color: Colors.white),
-                                ),
+                                        "Register",
+                                        style: TextStyle(
+                                            fontSize: 18, color: Colors.white),
+                                      ),
                               ),
                               SizedBox(height: 10),
                               TextButton(
@@ -183,7 +195,8 @@ class _RegisterState extends State<Register>
                                 },
                                 child: Text(
                                   "Back to Login",
-                                  style: TextStyle(fontSize: 16, color: Colors.blue[800]),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.blue[800]),
                                 ),
                               ),
                             ],
@@ -222,7 +235,8 @@ class _RegisterState extends State<Register>
         filled: true,
         fillColor: Colors.grey[200],
       ),
-      validator: (value) => value == null || value.isEmpty ? "Please enter your $label." : null,
+      validator: (value) =>
+          value == null || value.isEmpty ? "Please enter your $label." : null,
     );
   }
 }

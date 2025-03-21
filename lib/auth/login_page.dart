@@ -1,6 +1,9 @@
 import 'package:mpl_lab/auth/register.dart';
+import 'package:mpl_lab/auth/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:mpl_lab/Widgets/captcha.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +21,7 @@ class _LoginPageState extends State<LoginPage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _isLoading = false;
+  bool _isCaptchaValid = false;
 
   @override
   void initState() {
@@ -56,6 +60,12 @@ class _LoginPageState extends State<LoginPage>
         _isLoading = true;
       });
       try {
+        // Verify CAPTCHA using Firebase App Check
+        await FirebaseAppCheck.instance.activate(
+          androidProvider: AndroidProvider.playIntegrity,
+          appleProvider: AppleProvider.appAttest,
+        );
+
         UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -123,7 +133,8 @@ class _LoginPageState extends State<LoginPage>
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Image.asset('assets/logo.png', height: 100, width: 100),
+                              Image.asset('assets/logo.png',
+                                  height: 100, width: 100),
                               SizedBox(height: 24),
                               Text(
                                 "Welcome Back",
@@ -148,43 +159,83 @@ class _LoginPageState extends State<LoginPage>
                                 obscureText: true,
                               ),
                               SizedBox(height: 24),
+                              CaptchaWidget(
+                                onValidationChanged: (isValid) {
+                                  setState(() {
+                                    _isCaptchaValid = isValid;
+                                  });
+                                },
+                              ),
+                              SizedBox(height: 24),
                               Column(
                                 children: [
                                   ElevatedButton(
-                                    onPressed: _isLoading ? null : _login,
+                                    onPressed: (_isLoading || !_isCaptchaValid)
+                                        ? null
+                                        : _login,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blue[800],
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(30),
                                       ),
-                                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 32, vertical: 16),
                                     ),
                                     child: _isLoading
                                         ? SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                              strokeWidth: 2,
+                                            ),
+                                          )
                                         : Text(
-                                      "Login",
-                                      style: TextStyle(fontSize: 18, color: Colors.white),
-                                    ),
+                                            "Login",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white),
+                                          ),
                                   ),
                                   SizedBox(height: 10),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => Register()), // Navigate to RegisterPage
-                                      );
-                                    },
-                                    child: Text(
-                                      "Register",
-                                      style: TextStyle(fontSize: 16, color: Colors.blue[800]),
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Register()),
+                                          );
+                                        },
+                                        child: Text(
+                                          "Register",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.blue[800]),
+                                        ),
+                                      ),
+                                      Text(" | ",
+                                          style: TextStyle(color: Colors.grey)),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ForgotPasswordPage()),
+                                          );
+                                        },
+                                        child: Text(
+                                          "Forgot Password?",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.blue[800]),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               )
