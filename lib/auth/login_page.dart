@@ -61,10 +61,6 @@ class _LoginPageState extends State<LoginPage>
       });
       try {
         // Verify CAPTCHA using Firebase App Check
-        await FirebaseAppCheck.instance.activate(
-          androidProvider: AndroidProvider.playIntegrity,
-          appleProvider: AppleProvider.appAttest,
-        );
 
         UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(

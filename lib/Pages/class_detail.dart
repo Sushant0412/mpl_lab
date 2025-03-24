@@ -414,6 +414,8 @@ class _ClassDetailState extends State<ClassDetail> {
                                     padding: EdgeInsets.only(top: 8),
                                     itemCount: students.length,
                                     itemBuilder: (context, index) {
+                                      students.sort((a, b) =>
+                                          a['roll'].compareTo(b['roll']));
                                       final student = students[index];
                                       final attendance = student['attendance']
                                               [selectedSubject] ??
