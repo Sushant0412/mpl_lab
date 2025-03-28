@@ -45,7 +45,22 @@ class _ClassDetailState extends State<ClassDetail> {
       if (lectureDoc.exists) {
         Map<String, dynamic> data = lectureDoc.data() as Map<String, dynamic>;
         setState(() {
-          totalLectures = Map<String, int>.from(data);
+          totalLectures = {};
+          data.forEach((key, value) {
+            if (value is num) {
+              totalLectures[key] = value.toInt();
+            } else if (value is Map) {
+              // If the value is a map, try to get the count from it
+              var count = value['count'];
+              if (count is num) {
+                totalLectures[key] = count.toInt();
+              } else {
+                totalLectures[key] = 0;
+              }
+            } else {
+              totalLectures[key] = 0;
+            }
+          });
         });
       }
     } catch (e) {
@@ -53,17 +68,30 @@ class _ClassDetailState extends State<ClassDetail> {
     }
   }
 
+  Widget attendancePercentageWidget(int attendance, int totalLectures) {
+    return Text(
+      "(${((attendance / totalLectures) * 100).toStringAsFixed(1)}%)",
+      style: GoogleFonts.montserrat(
+        fontSize: 14,
+        color: Colors.green.shade700,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
   Future<void> _updateTotalLectures(String subject, int count) async {
     try {
+      if (classRef == null) return;
+
       DocumentReference lectureRef =
-          classRef!.collection('totalLectures').doc('QbvIw46WHrLWSnPSKSYI');
+          classRef!.collection('totalLectures').doc(subject);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         DocumentSnapshot lectureDoc = await transaction.get(lectureRef);
 
         Map<String, dynamic> data = lectureDoc.exists
             ? (lectureDoc.data() as Map<String, dynamic>)
-            : {'AIDS-1': 0, 'DMBI': 0, 'EHF': 0, 'WT': 0, 'Web X': 0};
+            : {};
 
         data[subject] = count;
 
@@ -73,7 +101,6 @@ class _ClassDetailState extends State<ClassDetail> {
       debugPrint('Error updating total lectures: $e');
     }
   }
-
 
   Future<void> _fetchClassDetails({bool preserveSelection = false}) async {
     try {
@@ -588,6 +615,15 @@ class _ClassDetailState extends State<ClassDetail> {
                                                       ],
                                                     ),
                                                   ],
+                                                ),
+                                              ),
+                                              SizedBox(width: 16),
+                                              Text(
+                                                "(${((attendance / (totalLectures[selectedSubject!] ?? 1)) * 100).toStringAsFixed(1)}%)",
+                                                style: GoogleFonts.montserrat(
+                                                  fontSize: 14,
+                                                  color: Colors.green.shade700,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               Row(

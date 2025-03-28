@@ -240,7 +240,7 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildStatItem(classes.length.toString(), 'Classes'),
-                  _buildStatItem('64', 'Students'),
+                  _buildStatItem('194', 'Students'),
                 ],
               ),
             ),
