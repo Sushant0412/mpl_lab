@@ -22,6 +22,7 @@ class _ClassDetailState extends State<ClassDetail> {
   List<Map<String, dynamic>> students = [];
   List<Map<String, dynamic>> timetable = [];
   String? selectedSubject;
+  Map<String, int> totalLectures = {};
 
   @override
   void initState() {
@@ -387,13 +388,77 @@ class _ClassDetailState extends State<ClassDetail> {
                                     border:
                                         Border.all(color: Colors.blue.shade200),
                                   ),
-                                  child: Text(
-                                    selectedSubject!,
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.blue.shade700,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        selectedSubject!,
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue.shade700,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.shade100,
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon:
+                                                  Icon(Icons.remove, size: 16),
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalLectures[
+                                                          selectedSubject!] =
+                                                      (totalLectures[
+                                                                  selectedSubject!] ??
+                                                              0) -
+                                                          1;
+                                                  if (totalLectures[
+                                                          selectedSubject!]! <
+                                                      0) {
+                                                    totalLectures[
+                                                        selectedSubject!] = 0;
+                                                  }
+                                                });
+                                              },
+                                              padding: EdgeInsets.all(4),
+                                              constraints: BoxConstraints(
+                                                  minWidth: 24, minHeight: 24),
+                                            ),
+                                            Text(
+                                              '${totalLectures[selectedSubject!] ?? 0}',
+                                              style: GoogleFonts.montserrat(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.add, size: 16),
+                                              onPressed: () {
+                                                setState(() {
+                                                  totalLectures[
+                                                          selectedSubject!] =
+                                                      (totalLectures[
+                                                                  selectedSubject!] ??
+                                                              0) +
+                                                          1;
+                                                });
+                                              },
+                                              padding: EdgeInsets.all(4),
+                                              constraints: BoxConstraints(
+                                                  minWidth: 24, minHeight: 24),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                             ],
