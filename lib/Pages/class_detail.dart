@@ -591,23 +591,35 @@ class _ClassDetailState extends State<ClassDetail> {
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      "${student['roll']}. ${student['name']}",
+                                                      "${student['name']} (${student['roll']})",
                                                       style: GoogleFonts
                                                           .montserrat(
-                                                        fontSize: 16,
+                                                        fontSize: 14,
                                                         fontWeight:
                                                             FontWeight.w600,
                                                       ),
                                                     ),
-                                                    SizedBox(height: 4),
+                                                    SizedBox(height: 2),
                                                     Row(
                                                       children: [
                                                         Text(
                                                           "Attendance: $attendance",
                                                           style: GoogleFonts
                                                               .montserrat(
-                                                            fontSize: 14,
+                                                            fontSize: 12,
                                                             color: Colors.grey,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 6),
+                                                        Text(
+                                                          "(${((attendance / (totalLectures[selectedSubject!] ?? 1)) * 100).toStringAsFixed(1)}%)",
+                                                          style: GoogleFonts
+                                                              .montserrat(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .green.shade700,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                           ),
@@ -615,15 +627,6 @@ class _ClassDetailState extends State<ClassDetail> {
                                                       ],
                                                     ),
                                                   ],
-                                                ),
-                                              ),
-                                              SizedBox(width: 16),
-                                              Text(
-                                                "(${((attendance / (totalLectures[selectedSubject!] ?? 1)) * 100).toStringAsFixed(1)}%)",
-                                                style: GoogleFonts.montserrat(
-                                                  fontSize: 14,
-                                                  color: Colors.green.shade700,
-                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
                                               Row(
