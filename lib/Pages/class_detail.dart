@@ -23,20 +23,61 @@ class _ClassDetailState extends State<ClassDetail> {
   List<Map<String, dynamic>> timetable = [];
   String? selectedSubject;
   Map<String, int> totalLectures = {};
+  DocumentReference? classRef;
 
   @override
   void initState() {
     super.initState();
+    classRef =
+        FirebaseFirestore.instance.collection('classes').doc(widget.classId);
     _fetchClassDetails();
     _fetchTimetable();
+    _fetchTotalLectures();
   }
+
+  Future<void> _fetchTotalLectures() async {
+    if (selectedSubject == null) return;
+
+    try {
+      DocumentSnapshot lectureDoc =
+          await classRef!.collection('totalLectures').doc('subjects').get();
+
+      if (lectureDoc.exists) {
+        Map<String, dynamic> data = lectureDoc.data() as Map<String, dynamic>;
+        setState(() {
+          totalLectures = Map<String, int>.from(data);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching total lectures: $e');
+    }
+  }
+
+  Future<void> _updateTotalLectures(String subject, int count) async {
+    try {
+      DocumentReference lectureRef =
+          classRef!.collection('totalLectures').doc('QbvIw46WHrLWSnPSKSYI');
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot lectureDoc = await transaction.get(lectureRef);
+
+        Map<String, dynamic> data = lectureDoc.exists
+            ? (lectureDoc.data() as Map<String, dynamic>)
+            : {'AIDS-1': 0, 'DMBI': 0, 'EHF': 0, 'WT': 0, 'Web X': 0};
+
+        data[subject] = count;
+
+        transaction.set(lectureRef, data);
+      });
+    } catch (e) {
+      debugPrint('Error updating total lectures: $e');
+    }
+  }
+
 
   Future<void> _fetchClassDetails({bool preserveSelection = false}) async {
     try {
-      DocumentSnapshot classDoc = await FirebaseFirestore.instance
-          .collection('classes')
-          .doc(widget.classId)
-          .get();
+      DocumentSnapshot classDoc = await classRef!.get();
 
       if (classDoc.exists) {
         className = classDoc['Name'];
@@ -414,18 +455,18 @@ class _ClassDetailState extends State<ClassDetail> {
                                                   Icon(Icons.remove, size: 16),
                                               onPressed: () {
                                                 setState(() {
+                                                  int newCount = (totalLectures[
+                                                              selectedSubject!] ??
+                                                          0) -
+                                                      1;
+                                                  if (newCount < 0)
+                                                    newCount = 0;
                                                   totalLectures[
                                                           selectedSubject!] =
-                                                      (totalLectures[
-                                                                  selectedSubject!] ??
-                                                              0) -
-                                                          1;
-                                                  if (totalLectures[
-                                                          selectedSubject!]! <
-                                                      0) {
-                                                    totalLectures[
-                                                        selectedSubject!] = 0;
-                                                  }
+                                                      newCount;
+                                                  _updateTotalLectures(
+                                                      selectedSubject!,
+                                                      newCount);
                                                 });
                                               },
                                               padding: EdgeInsets.all(4),
@@ -443,12 +484,16 @@ class _ClassDetailState extends State<ClassDetail> {
                                               icon: Icon(Icons.add, size: 16),
                                               onPressed: () {
                                                 setState(() {
+                                                  int newCount = (totalLectures[
+                                                              selectedSubject!] ??
+                                                          0) +
+                                                      1;
                                                   totalLectures[
                                                           selectedSubject!] =
-                                                      (totalLectures[
-                                                                  selectedSubject!] ??
-                                                              0) +
-                                                          1;
+                                                      newCount;
+                                                  _updateTotalLectures(
+                                                      selectedSubject!,
+                                                      newCount);
                                                 });
                                               },
                                               padding: EdgeInsets.all(4),
