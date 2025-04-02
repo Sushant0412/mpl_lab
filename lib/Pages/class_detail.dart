@@ -36,31 +36,32 @@ class _ClassDetailState extends State<ClassDetail> {
   }
 
   Future<void> _fetchTotalLectures() async {
-    if (selectedSubject == null) return;
-
     try {
-      DocumentSnapshot lectureDoc =
-          await classRef!.collection('totalLectures').doc('subjects').get();
+      DocumentSnapshot lectureDoc = await classRef!
+          .collection('totalLectures')
+          .doc('QbvIw46WHrLWSnPSKSYI')
+          .get();
 
       if (lectureDoc.exists) {
         Map<String, dynamic> data = lectureDoc.data() as Map<String, dynamic>;
-        setState(() {
-          totalLectures = {};
-          data.forEach((key, value) {
-            if (value is num) {
-              totalLectures[key] = value.toInt();
-            } else if (value is Map) {
-              // If the value is a map, try to get the count from it
-              var count = value['count'];
-              if (count is num) {
-                totalLectures[key] = count.toInt();
-              } else {
-                totalLectures[key] = 0;
-              }
+        Map<String, int> newTotalLectures = {};
+        data.forEach((key, value) {
+          if (value is num) {
+            newTotalLectures[key] = value.toInt();
+          } else if (value is Map) {
+            var count = value['count'];
+            if (count is num) {
+              newTotalLectures[key] = count.toInt();
             } else {
-              totalLectures[key] = 0;
+              newTotalLectures[key] = 0;
             }
-          });
+          } else {
+            newTotalLectures[key] = 0;
+          }
+        });
+        if (!mounted) return;
+        setState(() {
+          totalLectures = newTotalLectures;
         });
       }
     } catch (e) {
@@ -84,7 +85,7 @@ class _ClassDetailState extends State<ClassDetail> {
       if (classRef == null) return;
 
       DocumentReference lectureRef =
-          classRef!.collection('totalLectures').doc(subject);
+          classRef!.collection('totalLectures').doc('QbvIw46WHrLWSnPSKSYI');
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         DocumentSnapshot lectureDoc = await transaction.get(lectureRef);
